@@ -37,7 +37,16 @@ The system should be allow the user to enter the general owner and pet informati
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+
+  The scheduler uses a **greedy algorithm** instead of an optimal knapsack approach. It sorts all due tasks by a composite key (priority descending, time-of-day ascending, shortest duration first) and then walks through the list, adding each task to the plan only if it still fits within the owner's available time. Once a task is skipped because it doesn't fit, the algorithm never revisits that decision — it cannot swap out a longer task it already accepted in favor of two shorter ones that together would deliver more value.
+
+  A second tradeoff is **slot-based conflict detection rather than exact-time overlap detection**. Tasks carry a broad `preferred_time` slot ("morning", "afternoon", "evening") instead of a precise start time. The `detect_conflicts()` method checks whether total minutes in a slot exceed a fixed budget (e.g., 60 min for morning) and flags same-pet and cross-pet overlaps at that granularity — but it cannot tell you that "Morning walk at 8:00" and "Feed Luna at 8:00" literally overlap on the clock.
+
 - Why is that tradeoff reasonable for this scenario?
+
+  For a typical pet owner managing a handful of pets and fewer than ~20 daily tasks, the greedy approach produces a good-enough schedule instantly. The difference between greedy and optimal only matters when there are many tasks competing for a tight time window, which is uncommon in day-to-day pet care. The simplicity of the greedy algorithm also makes `explain_plan()` easy to reason about — "highest priority first, skip what doesn't fit" is a one-sentence explanation an owner can trust.
+
+  Slot-based detection is reasonable because most pet owners think in broad time blocks ("I handle walks in the morning and grooming in the evening"), not in minute-level calendars. Flagging that the morning is overloaded by 15 minutes is actionable enough to prompt the owner to move a task, without requiring them to input exact start times for every activity. It keeps the input burden low while still catching the most common scheduling mistake — cramming too much into one part of the day.
 
 ---
 

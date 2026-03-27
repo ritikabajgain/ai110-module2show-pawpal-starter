@@ -22,6 +22,15 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Smarter Scheduling
+
+Beyond the basic priority-first planner, PawPal+ includes four algorithmic improvements:
+
+- **Multi-key sorting** — `generate_plan()` sorts tasks by priority (high first), then by time-of-day (morning before evening), then by shortest duration. This produces a schedule that reads like a real daily routine instead of a flat priority list.
+- **Predicate-based filtering** — `filter_tasks()` lets you narrow tasks by pet name, completion status, and/or category in any combination (e.g., "show me Mochi's pending walks").
+- **Recurring task auto-creation** — When a daily, weekly, or monthly task is marked complete, `create_next_occurrence()` uses `timedelta` to calculate the next due date and automatically adds a new task instance to the pet. One-time tasks (`"once"`) produce no follow-up.
+- **Lightweight conflict detection** — `detect_conflicts()` groups planned tasks by time slot and checks three conditions: same-pet overlap (one pet has too many tasks in a slot), cross-pet overlap (the owner is double-booked across pets), and total slot overflow. Conflicts are returned as warning strings — the program never crashes.
+
 ## Getting started
 
 ### Setup
